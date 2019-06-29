@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser
+from contextlib import contextmanager
 import os
 import sys
 
@@ -15,6 +16,17 @@ from PyQt5.QtCore import (
 )
 
 
+@contextmanager
+def prepare_loop(sig=None):
+    loop = QEventLoop()
+    if sig is not None:
+        sig.connect(loop.quit)
+
+    yield loop
+
+    loop.exec_()
+
+
 class App(QApplication):
     def convert(self, args):
         page = QWebEnginePage()
@@ -26,17 +38,12 @@ class App(QApplication):
             cookie.setDomain(qurl.host())
             store.setCookie(cookie)
 
-        loop = QEventLoop()
-        page.loadFinished.connect(loop.quit)
+        with prepare_loop(page.loadFinished):
+            page.load(qurl)
 
-        page.load(qurl)
-        loop.exec_()
 
-        loop = QEventLoop()
-        page.pdfPrintingFinished.connect(loop.quit)
-
-        page.printToPdf(os.path.abspath(args.dest))
-        loop.exec_()
+        with prepare_loop(page.pdfPrintingFinished):
+            page.printToPdf(os.path.abspath(args.dest))
 
 
 def parse_cookies(cookiestr):
