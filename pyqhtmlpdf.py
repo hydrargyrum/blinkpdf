@@ -5,7 +5,7 @@ from contextlib import contextmanager
 import os
 import sys
 
-from PyQt5.QtWebEngineWidgets import QWebEnginePage
+from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineProfile
 from PyQt5.QtNetwork import QNetworkCookie
 from PyQt5.QtWidgets import (
     QApplication,
@@ -27,9 +27,30 @@ def prepare_loop(sig=None):
     loop.exec_()
 
 
+class HeadlessPage(QWebEnginePage):
+    def javaScriptAlert(self, url, msg):
+        pass
+
+    def javaScriptConfirm(self, url, msg):
+        return False
+
+    def javaScriptPrompt(self, *args, **kwargs):
+        return False, None
+
+    def chooseFiles(self, *args, **kwargs):
+        return []
+
+
 class App(QApplication):
     def convert(self, args):
-        page = QWebEnginePage()
+        profile = QWebEngineProfile()
+        page = HeadlessPage(profile)
+
+        settings = page.settings()
+        settings.setAttribute(settings.JavascriptCanOpenWindows, False)
+        settings.setAttribute(settings.WebGLEnabled, False)
+        settings.setAttribute(settings.AutoLoadIconsForPage, False)
+        settings.setAttribute(settings.ShowScrollBars, False)
 
         qurl = QUrl(args.url)
         store = page.profile().cookieStore()
