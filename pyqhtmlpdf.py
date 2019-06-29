@@ -41,6 +41,9 @@ class App(QApplication):
         with prepare_loop(page.loadFinished):
             page.load(qurl)
 
+        for js in args.run_script:
+            with prepare_loop() as loop:
+                page.runJavaScript(js, lambda _: loop.quit())
 
         with prepare_loop(page.pdfPrintingFinished):
             page.printToPdf(os.path.abspath(args.dest))
@@ -57,6 +60,7 @@ if __name__ == '__main__':
         '--cookie', type=parse_cookies,
         dest='cookies', action='append', default=[],
     )
+    parser.add_argument('--run-script', action='append', default=[])
     parser.add_argument('url')
     parser.add_argument('dest')
     args = parser.parse_args()
