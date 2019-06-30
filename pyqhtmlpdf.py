@@ -34,10 +34,10 @@ class HeadlessPage(QWebEnginePage):
     def javaScriptConfirm(self, url, msg):
         return False
 
-    def javaScriptPrompt(self, *args, **kwargs):
+    def javaScriptPrompt(self, url, msg, default):
         return False, None
 
-    def chooseFiles(self, *args, **kwargs):
+    def chooseFiles(self, mode, old, mime):
         return []
 
 
