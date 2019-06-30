@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 from contextlib import contextmanager
 import os
+import subprocess
 import sys
 
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineProfile
@@ -14,6 +15,17 @@ from PyQt5.QtWebEngine import QtWebEngine
 from PyQt5.QtCore import (
     QUrl, QEventLoop,
 )
+
+
+__all__ = (
+    'init',
+    'convert',
+    'run_main',
+    'xvfb_run_main',
+)
+
+
+APP = None
 
 
 @contextmanager
@@ -41,38 +53,57 @@ class HeadlessPage(QWebEnginePage):
         return []
 
 
-class App(QApplication):
-    def convert(self, args):
-        profile = QWebEngineProfile()
-        page = HeadlessPage(profile)
+def convert(args):
+    profile = QWebEngineProfile()
+    page = HeadlessPage(profile)
 
-        settings = page.settings()
-        settings.setAttribute(settings.JavascriptCanOpenWindows, False)
-        settings.setAttribute(settings.WebGLEnabled, False)
-        settings.setAttribute(settings.AutoLoadIconsForPage, False)
-        settings.setAttribute(settings.ShowScrollBars, False)
+    settings = page.settings()
+    settings.setAttribute(settings.JavascriptCanOpenWindows, False)
+    settings.setAttribute(settings.WebGLEnabled, False)
+    settings.setAttribute(settings.AutoLoadIconsForPage, False)
+    settings.setAttribute(settings.ShowScrollBars, False)
 
-        qurl = QUrl(args.url)
-        store = page.profile().cookieStore()
-        for name, value in args.cookies:
-            cookie = QNetworkCookie(name.encode('utf-8'), value.encode('utf-8'))
-            cookie.setDomain(qurl.host())
-            store.setCookie(cookie)
+    qurl = QUrl(args['url'])
+    store = page.profile().cookieStore()
+    for name, value in args.get('cookies', ()):
+        cookie = QNetworkCookie(name.encode('utf-8'), value.encode('utf-8'))
+        cookie.setDomain(qurl.host())
+        store.setCookie(cookie)
 
-        with prepare_loop(page.loadFinished):
-            page.load(qurl)
+    with prepare_loop(page.loadFinished):
+        page.load(qurl)
 
-        for js in args.run_script:
-            with prepare_loop() as loop:
-                page.runJavaScript(js, lambda _: loop.quit())
+    for js in args.get('run_script', ()):
+        with prepare_loop() as loop:
+            page.runJavaScript(js, lambda _: loop.quit())
 
-        with prepare_loop(page.pdfPrintingFinished):
-            page.printToPdf(os.path.abspath(args.dest))
+    with prepare_loop(page.pdfPrintingFinished):
+        page.printToPdf(os.path.abspath(args['dest']))
+
+
+def init(create_app=True):
+    global APP
+
+    if QApplication.instance() is None and create_app:
+        APP = QApplication([])
+
+    QtWebEngine.initialize()
 
 
 def parse_cookies(cookiestr):
     name, _, value = cookiestr.partition('=')
     return (name, value)
+
+
+def run_main(args, prepend=None):
+    cmd = [sys.executable, __file__] + list(args)
+    if prepend:
+        cmd = list(prepend) + cmd
+    subprocess.check_call(cmd)
+
+
+def xvfb_run_main(args):
+    run_main(args, ['xvfb-run'])
 
 
 if __name__ == '__main__':
@@ -86,7 +117,6 @@ if __name__ == '__main__':
     parser.add_argument('dest')
     args = parser.parse_args()
 
-    app = App(sys.argv)
-    QtWebEngine.initialize()
-
-    app.convert(args)
+    app = QApplication(sys.argv)
+    init()
+    convert(vars(args))
