@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (
     QApplication,
 )
 from PyQt5.QtWebEngine import QtWebEngine
+from PyQt5.QtWebEngineCore import QWebEngineHttpRequest
 from PyQt5.QtCore import (
     QUrl, QEventLoop,
 )
@@ -64,6 +65,11 @@ def convert(args):
     settings.setAttribute(settings.ShowScrollBars, False)
 
     qurl = QUrl(args['url'])
+    req = QWebEngineHttpRequest(qurl)
+
+    for name, value in args.get('headers', ()):
+        req.setHeader(name.encode('utf-8'), value.encode('utf-8'))
+
     store = page.profile().cookieStore()
     for name, value in args.get('cookies', ()):
         cookie = QNetworkCookie(name.encode('utf-8'), value.encode('utf-8'))
@@ -71,7 +77,7 @@ def convert(args):
         store.setCookie(cookie)
 
     with prepare_loop(page.loadFinished):
-        page.load(qurl)
+        page.load(req)
 
     for js in args.get('run_script', ()):
         with prepare_loop() as loop:
@@ -111,6 +117,10 @@ if __name__ == '__main__':
     parser.add_argument(
         '--cookie', type=parse_cookies,
         dest='cookies', action='append', default=[],
+    )
+    parser.add_argument(
+        '--header', type=parse_cookies,
+        dest='headers', action='append', default=[],
     )
     parser.add_argument('--run-script', action='append', default=[])
     parser.add_argument('url')
