@@ -53,6 +53,17 @@ class HeadlessPage(QWebEnginePage):
     def chooseFiles(self, mode, old, mime):
         return []
 
+    def printToPdfAndReturn(self):
+        output = []
+        def callback(content):
+            output.append(content)
+            self.pdfPrintingFinished.emit('', True)
+
+        with prepare_loop(self.pdfPrintingFinished):
+            self.printToPdf(callback)
+
+        return output[0]
+
 
 def convert(args):
     profile = QWebEngineProfile()
@@ -83,8 +94,11 @@ def convert(args):
         with prepare_loop() as loop:
             page.runJavaScript(js, lambda _: loop.quit())
 
-    with prepare_loop(page.pdfPrintingFinished):
-        page.printToPdf(os.path.abspath(args['dest']))
+    if args['dest'] != '-':
+        with prepare_loop(page.pdfPrintingFinished):
+            page.printToPdf(os.path.abspath(args['dest']))
+    else:
+        sys.stdout.buffer.write(page.printToPdfAndReturn())
 
 
 def init(create_app=True):
@@ -105,11 +119,11 @@ def run_main(args, prepend=None):
     cmd = [sys.executable, __file__] + list(args)
     if prepend:
         cmd = list(prepend) + cmd
-    subprocess.check_call(cmd)
+    return subprocess.check_output(cmd)
 
 
 def xvfb_run_main(args):
-    run_main(args, ['xvfb-run'])
+    return run_main(args, ['xvfb-run'])
 
 
 if __name__ == '__main__':
