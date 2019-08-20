@@ -123,7 +123,9 @@ def run_main(args, prepend=None):
 
 
 def xvfb_run_main(args):
-    return run_main(args, ['xvfb-run'])
+    # put a very small resolution to reduce used memory, because we don't really need it, it doesn't influence pdf size
+    # -screen 0 width*height*bit depth
+    return run_main(args, ['xvfb-run', '-a', '-s', '-screen 0 2x2x8'])
 
 
 if __name__ == '__main__':
