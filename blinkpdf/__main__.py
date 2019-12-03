@@ -131,7 +131,7 @@ def xvfb_run_main(args):
     return run_main(args, ['xvfb-run', '-a', '-s', '-screen 0 2x2x8'])
 
 
-if __name__ == '__main__':
+def main():
     parser = ArgumentParser()
     parser.add_argument(
         '--cookie', type=parse_cookies,
@@ -149,3 +149,7 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     init()
     convert(vars(args))
+
+
+if __name__ == '__main__':
+    main()
