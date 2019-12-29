@@ -146,6 +146,11 @@ def main():
     parser.add_argument('dest')
     args = parser.parse_args()
 
+    # render headless (offscreen vs minimal?)
+    os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+    # for some reason, it can segfault if using offscreen with a DISPLAY...
+    os.environ.pop('DISPLAY', None)
+
     app = QApplication(sys.argv)
     init()
     convert(vars(args))
