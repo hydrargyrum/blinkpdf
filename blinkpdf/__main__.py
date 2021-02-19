@@ -71,6 +71,7 @@ class HeadlessPage(QWebEnginePage):
 def convert(args):
     profile = QWebEngineProfile()
     page = HeadlessPage(profile)
+    page.profile().setPersistentCookiesPolicy(QWebEngineProfile.NoPersistentCookies)
 
     settings = page.settings()
     settings.setAttribute(settings.JavascriptCanOpenWindows, False)
