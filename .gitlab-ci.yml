@@ -1,0 +1,6 @@
+lint:
+    image: "python:3"
+    stage: "test"
+    script:
+        - "pip install flake8"
+        - "flake8 blinkpdf"

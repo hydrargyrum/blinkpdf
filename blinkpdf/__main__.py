@@ -58,6 +58,7 @@ class HeadlessPage(QWebEnginePage):
 
     def printToPdfAndReturn(self):
         output = []
+
         def callback(content):
             output.append(content)
             self.pdfPrintingFinished.emit('', True)
@@ -127,8 +128,8 @@ def run_main(args, prepend=None):
 
 
 def xvfb_run_main(args):
-    # put a very small resolution to reduce used memory, because we don't really need it, it doesn't influence pdf size
-    # -screen 0 width*height*bit depth
+    # put a very small resolution to reduce used memory, because we don't really need it
+    # it doesn't influence pdf size
     return run_main(args, ['xvfb-run', '-a', '-s', '-screen 0 2x2x8'])
 
 
@@ -152,7 +153,7 @@ def main():
     # for some reason, it can segfault if using offscreen with a DISPLAY...
     os.environ.pop('DISPLAY', None)
 
-    app = QApplication(sys.argv)
+    app = QApplication(sys.argv)  # noqa
     init()
     convert(vars(args))
 
