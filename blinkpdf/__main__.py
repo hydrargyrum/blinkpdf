@@ -134,6 +134,8 @@ def xvfb_run_main(args):
 
 
 def main():
+    global APP
+
     parser = ArgumentParser()
     parser.add_argument(
         '--cookie', type=parse_cookies,
@@ -153,7 +155,7 @@ def main():
     # for some reason, it can segfault if using offscreen with a DISPLAY...
     os.environ.pop('DISPLAY', None)
 
-    app = QApplication(sys.argv)  # noqa
+    APP = QApplication(sys.argv)  # noqa
     init()
     convert(vars(args))
 
