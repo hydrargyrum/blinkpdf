@@ -110,7 +110,7 @@ def init(create_app=True):
     global APP
 
     if QApplication.instance() is None and create_app:
-        APP = QApplication([])
+        APP = QApplication(["blinkpdf", "--headless"])
 
     QtWebEngine.initialize()
 
@@ -155,7 +155,8 @@ def main():
     # for some reason, it can segfault if using offscreen with a DISPLAY...
     os.environ.pop('DISPLAY', None)
 
-    APP = QApplication(sys.argv)  # noqa
+    # XXX add mysterious --headless for Qt versions like 5.11
+    APP = QApplication(sys.argv + ['--headless'])
     init()
     convert(vars(args))
 
