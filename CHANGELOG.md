@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2021-04-30
+### Fixed
+- fix offscreen crashes with Qt 5.11 by passing mysterious --headless
+
 ## [1.3.0] - 2021-02-22
 ### Fixed
 - use a true off-the-record profile to avoid saving cache and cookies
