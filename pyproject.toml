@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "blinkpdf"
+dynamic = ["version"]
+description = "Blink-based webpage-to-pdf converter"
+readme = "README.md"
+license = "Unlicense"
+requires-python = ">= 3.5"
+authors = [
+    { name = "Hg", email = "dev@indigo.re" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: No Input/Output (Daemon)",
+    "Intended Audience :: Developers",
+    "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
+    "License :: Public Domain",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Printing",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "PyQt5",
+    "PyQtWebEngine",
+]
+
+[project.scripts]
+blinkpdf = "blinkpdf.__main__:main"
+
+[project.urls]
+Homepage = "https://gitlab.com/hydrargyrum/blinkpdf"
+
+[tool.hatch.version]
+path = "blinkpdf/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/blinkpdf",
+]
