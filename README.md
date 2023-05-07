@@ -1,6 +1,6 @@
 # BlinkPDF is yet another webpage-to-pdf converter
 
-It uses PyQt5 and QtWebEngine (with Blink engine) to do so.
+It uses PyQt6 and QtWebEngine (with Blink engine) to do so.
 
 Pass an URL and an output filename, the page will be retrieved and converted
 to PDF. Additionally, it can be given custom cookies and headers and also

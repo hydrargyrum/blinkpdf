@@ -11,14 +11,14 @@ import os
 import subprocess
 import sys
 
-from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineProfile
-from PyQt5.QtNetwork import QNetworkCookie
-from PyQt5.QtWidgets import (
+from PyQt6.QtNetwork import QNetworkCookie
+from PyQt6.QtWidgets import (
     QApplication,
 )
-from PyQt5.QtWebEngine import QtWebEngine
-from PyQt5.QtWebEngineCore import QWebEngineHttpRequest
-from PyQt5.QtCore import (
+from PyQt6.QtWebEngineCore import (
+    QWebEngineHttpRequest, QWebEnginePage, QWebEngineProfile,
+)
+from PyQt6.QtCore import (
     QUrl, QEventLoop,
 )
 
@@ -42,7 +42,7 @@ def prepare_loop(sig=None):
 
     yield loop
 
-    loop.exec_()
+    loop.exec()
 
 
 class HeadlessPage(QWebEnginePage):
@@ -77,10 +77,11 @@ def convert(args):
     page = HeadlessPage(profile, None)
 
     settings = page.settings()
-    settings.setAttribute(settings.JavascriptCanOpenWindows, False)
-    settings.setAttribute(settings.WebGLEnabled, False)
-    settings.setAttribute(settings.AutoLoadIconsForPage, False)
-    settings.setAttribute(settings.ShowScrollBars, False)
+    attributes = settings.WebAttribute
+    settings.setAttribute(attributes.JavascriptCanOpenWindows, False)
+    settings.setAttribute(attributes.WebGLEnabled, False)
+    settings.setAttribute(attributes.AutoLoadIconsForPage, False)
+    settings.setAttribute(attributes.ShowScrollBars, False)
 
     qurl = QUrl(args['url'])
     req = QWebEngineHttpRequest(qurl)
@@ -113,8 +114,6 @@ def init(create_app=True):
 
     if QApplication.instance() is None and create_app:
         APP = QApplication(["blinkpdf", "--headless"])
-
-    QtWebEngine.initialize()
 
 
 def parse_cookies(cookiestr):
