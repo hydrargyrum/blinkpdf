@@ -13,4 +13,4 @@ the page).
 
 ## Install
 
-[`pip install blinkpdf`](https://pypi.org/project/blinkpdf/)
+[`pipx install blinkpdf`](https://pypi.org/project/blinkpdf/)
